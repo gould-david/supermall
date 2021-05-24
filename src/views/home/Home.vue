@@ -3,13 +3,14 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
-    <home-swiper :banners="banners"></home-swiper>
-    <recommend-view :recommends="recommends"></recommend-view>
-    <feature-view />
-    <tab-controll class="tab-controll" :titles="['流行','新款','精选']" @tabClick="tabClick"/>
-    <goods-list :goods="showGoods" />
 
-
+    <scroll class="content">
+      <home-swiper :banners="banners"></home-swiper>
+      <recommend-view :recommends="recommends"></recommend-view>
+      <feature-view />
+      <tab-controll class="tab-controll" :titles="['流行','新款','精选']" @tabClick="tabClick"/>
+      <goods-list :goods="showGoods" />
+    </scroll>
 
   </div>
 
@@ -19,7 +20,8 @@
 
   import NavBar from "components/common/navbar/NavBar";
   import TabControll from "components/content/tabControll/TabControll";
-  import GoodsList from "../../components/content/goods/GoodsList";
+  import GoodsList from "components/content/goods/GoodsList";
+  import Scroll from "../../components/common/scroll/Scroll";
 
   import HomeSwiper from "./childComps/HomeSwiper";
   import RecommendView from "./childComps/RecommendView";
@@ -31,7 +33,7 @@
   export default {
     name: "Home",
     components: {
-      NavBar,TabControll,GoodsList,
+      NavBar,TabControll,GoodsList,Scroll,
       HomeSwiper,
       RecommendView,
       FeatureView,
@@ -106,7 +108,10 @@
 
 <style scoped>
   #home {
+    position: relative;
     padding-top: 44px;
+    /* 相当于满窗口 */
+    height: 100vh;
   }
   .home-nav {
     background-color: var(--color-tint);
@@ -122,4 +127,23 @@
     top: 44px;
     z-index: 9;
   }
+
+  .content {
+    /*
+      子绝父相
+      即这里是绝对定位，他的父组件一定要设置成相对定位
+    */
+    position: absolute;
+    overflow: hidden;
+    top: 44px;
+    bottom: 49px;
+    left: 0;
+    right: 0;
+  }
+  /*
+  .content {
+    height: calc(100% - 49px - 44px);
+    margin-top: 44px;
+    overflow: hidden;
+  }*/
 </style>

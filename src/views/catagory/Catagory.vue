@@ -2,6 +2,7 @@
   <div class="wrapper">
 
     <ul class="content">
+      <button @click="btnClick">按钮</button>
       <li>fenlei1</li>
       <li>fenlei2</li>
       <li>fenlei3</li>
@@ -112,9 +113,23 @@
   export default {
     name: "Catagory",
     mounted() {
-      new BScroll(document.querySelector('.wrapper'),{
-
+      const bscroll = new BScroll(document.querySelector('.wrapper'),{
+        //监测滚动到哪了
+        probeType: 3,
+        //上拉加载更多
+        pullUpLoad:true
       })
+      bscroll.on('scroll',position => {
+        //console.log(position);
+      })
+      bscroll.on('pullingUp',() => {
+        console.log('上拉加载更多');
+      })
+    },
+    methods:{
+      btnClick(){
+        console.log('btnClick');
+      }
     }
   }
 </script>
@@ -123,7 +138,7 @@
   .wrapper {
     height: 150px;
     background-color: red;
-
+    overflow: hidden;
     /* 使用原生的JS，实现局部滚动，
     为什么要抛弃原生的JS，因为应用在移动端运行时，原生JS的滚动特别的不好用
     overflow: hidden;
