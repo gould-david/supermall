@@ -4,13 +4,26 @@
       <div slot="center">购物街</div>
     </nav-bar>
 
-    <scroll class="content">
+    <scroll class="content"
+            ref="home_scroll"
+            :probeType="3"
+            @contentScroll="contentScroll"
+            :pull-up-load="true"
+            @contentPullingUp="loadMore">
       <home-swiper :banners="banners"></home-swiper>
       <recommend-view :recommends="recommends"></recommend-view>
       <feature-view />
       <tab-controll class="tab-controll" :titles="['流行','新款','精选']" @tabClick="tabClick"/>
       <goods-list :goods="showGoods" />
     </scroll>
+
+
+    <!--  通过子组件进行监听事件
+    <back-top @backTopClick="backTopClick"/>-->
+    <!--  直接监听组件的原生事件。
+      组件默认是不能监听点击事件的，只有增加.native修饰符，才能完成监听
+    -->
+    <back-top @click.native="backClick" v-show="isShowBackTop"/>
 
   </div>
 
@@ -19,9 +32,10 @@
 <script>
 
   import NavBar from "components/common/navbar/NavBar";
+  import Scroll from "components/common/scroll/Scroll";
   import TabControll from "components/content/tabControll/TabControll";
   import GoodsList from "components/content/goods/GoodsList";
-  import Scroll from "../../components/common/scroll/Scroll";
+  import BackTop from "components/content/backTop/BackTop";
 
   import HomeSwiper from "./childComps/HomeSwiper";
   import RecommendView from "./childComps/RecommendView";
@@ -33,7 +47,7 @@
   export default {
     name: "Home",
     components: {
-      NavBar,TabControll,GoodsList,Scroll,
+      NavBar,TabControll,GoodsList,Scroll,BackTop,
       HomeSwiper,
       RecommendView,
       FeatureView,
@@ -54,7 +68,8 @@
           'new':{page: 0, list:[]},
           'sell':{page: 0, list:[]}
         },
-        currentType:'pop'
+        currentType:'pop',
+        isShowBackTop: true
       }
     },
     created() {
@@ -83,6 +98,28 @@
             break
         }
       },
+
+      /*// 一键到顶，接收子组件发射$emit过来的方法
+      backTopClick(){
+        //取得子组件的对象
+        console.log(this.$refs.home_scroll.scroll);
+        this.$refs.home_scroll.scroll.scrollTo(0,0)
+      }*/
+      backClick(){
+        // 调用Scroll组件中封装好的方法。
+        this.$refs.home_scroll.scrollTo(0 , 0)
+      },
+      contentScroll(position){
+        this.isShowBackTop = Math.abs(position.y) > 1000
+        //console.log(this.isShowBackTop);
+      },
+      loadMore(){
+        console.log('上拉加载，重新调用getHomeGoods');
+        this.getHomeGoods(this.currentType)
+        this.$refs.home_scroll.finishPullingUp();
+      },
+
+
       /*
       网络请求相关
       */
@@ -100,7 +137,7 @@
           this.goods[type].list.push(...res.data.list)
           this.goods[type].page += 1
         })
-      }
+      },
 
     }
   }

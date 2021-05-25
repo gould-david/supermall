@@ -11,6 +11,20 @@
   import BScroll from 'better-scroll'
   export default {
     name: "Scroll",
+    props:{
+      probeType:{
+        type:Number,
+        default(){
+          return 0
+        }
+      },
+      pullUpLoad:{
+        type:Boolean,
+        default(){
+          return true
+        }
+      }
+    },
     data(){
       return {
         scroll:null
@@ -25,8 +39,30 @@
       *   ref如果绑定在元素中，那么通过this.$refs.refname获取到的是一个元素对象
       * */
       this.scroll = new BScroll(this.$refs.wrapper,{
-
+        click: true,
+        probeType: this.probeType,
+        pullUpLoad: this.pullUpLoad
       })
+
+      //监听滚动的位置
+      this.scroll.on('scroll',position => {
+        this.$emit('contentScroll',position)
+      })
+
+      ///上拉加载更多
+      this.scroll.on('pullingUp',() => {
+        console.log('上拉加载更多');
+        this.$emit('contentPullingUp')
+      })
+    },
+    methods:{
+      // 参数可以提供滚动的毫秒数
+      scrollTo(x, y ,time=300){
+        this.scroll.scrollTo(x,y,time)
+      },
+      finishPullingUp(){
+        this.scroll.finishPullUp();
+      }
     }
 
   }
