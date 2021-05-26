@@ -79,6 +79,12 @@
       this.getHomeGoods('pop');
       this.getHomeGoods('new');
       this.getHomeGoods('sell');
+
+      //监听事件总线中的GoodListItem中图片加载完成后发射出来的事件
+      this.$bus.$on('itemImageLoad',() => {
+        console.log('------------')
+        this.$refs.home_scroll.refresh()
+      })
     },
     methods:{
       /*
