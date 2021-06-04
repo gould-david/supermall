@@ -80,16 +80,45 @@
       this.getHomeGoods('new');
       this.getHomeGoods('sell');
 
+
+    },
+    mounted(){
+
+      // 如果监听是放到created中，那么有时是在created中取不this.$refs.home的对象的。
       //监听事件总线中的GoodListItem中图片加载完成后发射出来的事件
+      /*console.log(this.$refs.home_scroll.refresh); 有返回值
+      console.log(this.$refs.home_scroll.refresh()); 无返回值，直接调用方法内部了*/
+      const refresh = this.debounce(this.$refs.home_scroll.refresh,200)
+      console.log(refresh());
+      console.log(refresh);
+
       this.$bus.$on('itemImageLoad',() => {
-        console.log('------------')
-        this.$refs.home_scroll.refresh()
+
+        /*this.$refs.home_scroll && this.$refs.home_scroll.refresh()*/
+        console.log('图片加载完成');
+        refresh()
       })
     },
     methods:{
       /*
         事件监听相关方法
       */
+
+      // 防抖
+      debounce(func, delay){
+        console.log('debounce');
+        let timer = null;
+        return function(...args){
+          //只要是执行到这，会清空上一次的setInterval
+          if(timer) clearTimeout(timer)
+          console.log('延时器未执行');
+          timer = setTimeout(() => {
+            console.log('延时器被执行');
+            func.apply(this, args)
+          },delay)
+        }
+      },
+
       tabClick(index){
 
         switch (index) {
