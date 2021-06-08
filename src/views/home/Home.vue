@@ -3,17 +3,17 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
-
+    <tab-controll ref="tabControll1" :titles="['流行','新款','精选']" @tabClick="tabClick" class="tabControll" v-show="isTabFixed"/> <!--//v-show="isTabFixed"-->
     <scroll class="content"
             ref="home_scroll"
             :probeType="3"
             @contentScroll="contentScroll"
             :pull-up-load="true"
             @contentPullingUp="loadMore">
-      <home-swiper :banners="banners"></home-swiper>
+      <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad"></home-swiper>
       <recommend-view :recommends="recommends"></recommend-view>
       <feature-view />
-      <tab-controll class="tab-controll" :titles="['流行','新款','精选']" @tabClick="tabClick"/>
+      <tab-controll ref="tabControll2" :titles="['流行','新款','精选']" @tabClick="tabClick"/>
       <goods-list :goods="showGoods" />
     </scroll>
 
@@ -42,6 +42,7 @@
   import FeatureView from "./childComps/FeatureView";
 
   import {getHomeMultidata,getHomeGoods} from "network/home";
+  import {debounce} from "common/util";
 
 
   export default {
@@ -69,7 +70,9 @@
           'sell':{page: 0, list:[]}
         },
         currentType:'pop',
-        isShowBackTop: true
+        isShowBackTop: true,
+        tabOffsetTop : 0,
+        isTabFixed: false
       }
     },
     created() {
@@ -88,12 +91,9 @@
       //监听事件总线中的GoodListItem中图片加载完成后发射出来的事件
       /*console.log(this.$refs.home_scroll.refresh); 有返回值
       console.log(this.$refs.home_scroll.refresh()); 无返回值，直接调用方法内部了*/
-      const refresh = this.debounce(this.$refs.home_scroll.refresh,200)
-      console.log(refresh());
-      console.log(refresh);
-
+      //使用防抖函数调用scroll.refresh
+      const refresh = debounce(this.$refs.home_scroll.refresh,200)
       this.$bus.$on('itemImageLoad',() => {
-
         /*this.$refs.home_scroll && this.$refs.home_scroll.refresh()*/
         console.log('图片加载完成');
         refresh()
@@ -103,21 +103,6 @@
       /*
         事件监听相关方法
       */
-
-      // 防抖
-      debounce(func, delay){
-        console.log('debounce');
-        let timer = null;
-        return function(...args){
-          //只要是执行到这，会清空上一次的setInterval
-          if(timer) clearTimeout(timer)
-          console.log('延时器未执行');
-          timer = setTimeout(() => {
-            console.log('延时器被执行');
-            func.apply(this, args)
-          },delay)
-        }
-      },
 
       tabClick(index){
 
@@ -132,6 +117,15 @@
             this.currentType = 'sell'
             break
         }
+        this.$refs.tabControll1.currentIntex = index
+        this.$refs.tabControll2.currentIntex = index
+      },
+
+      swiperImageLoad(){
+        //tab-controll实现吸顶效果
+        //要获取到tabControll2在父组件中的位置，需要考虑到图片加载需要时间，因此在轮播图加载完成后，在这里取组件内元素的offsetTop属性
+        console.log(this.$refs.tabControll2.$el.offsetTop);
+        this.tabOffsetTop = this.$refs.tabControll2.$el.offsetTop;
       },
 
       /*// 一键到顶，接收子组件发射$emit过来的方法
@@ -145,8 +139,10 @@
         this.$refs.home_scroll.scrollTo(0 , 0)
       },
       contentScroll(position){
+        //判断BackTop是否显示
         this.isShowBackTop = Math.abs(position.y) > 1000
-        //console.log(this.isShowBackTop);
+        //决定TabControll2是否吸顶(position:fixed)
+        this.isTabFixed = Math.abs(position.y) > this.tabOffsetTop
       },
       loadMore(){
         console.log('上拉加载，重新调用getHomeGoods');
@@ -181,25 +177,27 @@
 <style scoped>
   #home {
     position: relative;
-    padding-top: 44px;
+
     /* 相当于满窗口 */
     height: 100vh;
   }
   .home-nav {
     background-color: var(--color-tint);
     color: white;
-    position: fixed;
+    /*position: fixed;
     left: 0;
     right: 0;
     top: 0;
+    z-index: 9;*/
+  }
+  .tabControll {
+    position: relative;
+    /*position: absolute;
+    top:44px;
+    left: 0;
+    right: 0;*/
     z-index: 9;
   }
-  .tab-controll {
-    position: sticky;
-    top: 44px;
-    z-index: 9;
-  }
-
   .content {
     /*
       子绝父相
