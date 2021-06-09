@@ -57,8 +57,9 @@
     },
     methods:{
       // 参数可以提供滚动的毫秒数
-      scrollTo(x, y ,time=300){
+      scrollTo(x, y ,time){
         // 为避免this.scroll未被创建出来
+        console.log(time);
         this.scroll && this.scroll.scrollTo(x,y,time)
       },
       finishPullingUp(){
@@ -67,6 +68,9 @@
       refresh(){
         //console.log('------------')
         this.scroll && this.scroll.refresh()
+      },
+      getScrollHeight(){
+        return this.scroll.y ? this.scroll.y : 0
       }
     }
 

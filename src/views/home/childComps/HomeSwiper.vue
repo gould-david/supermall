@@ -34,7 +34,7 @@
         //console.log('swiperImgLoad');
         if(!this.isLoad){
           this.$emit('swiperImageLoad')
-          this.isLoad = !this.isLoad
+          this.isLoad = true
         }
       }
     }

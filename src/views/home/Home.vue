@@ -72,7 +72,8 @@
         currentType:'pop',
         isShowBackTop: true,
         tabOffsetTop : 0,
-        isTabFixed: false
+        isTabFixed: false,
+        userScrollHeight:0
       }
     },
     created() {
@@ -98,6 +99,16 @@
         console.log('图片加载完成');
         refresh()
       })
+    },
+    activated() {
+      console.log(this.userScrollHeight);
+      this.$refs.home_scroll.scrollTo(0 , this.userScrollHeight , 0 )
+      this.$refs.home_scroll.refresh()
+    },
+    deactivated() {
+      //记录上次滑动到的位置
+      this.userScrollHeight = this.$refs.home_scroll.getScrollHeight();
+      console.log(this.userScrollHeight);
     },
     methods:{
       /*
@@ -136,7 +147,7 @@
       }*/
       backClick(){
         // 调用Scroll组件中封装好的方法。
-        this.$refs.home_scroll.scrollTo(0 , 0)
+        this.$refs.home_scroll.scrollTo(0 , 0 , 1000)
       },
       contentScroll(position){
         //判断BackTop是否显示
