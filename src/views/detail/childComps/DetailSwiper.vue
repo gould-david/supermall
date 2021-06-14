@@ -1,9 +1,9 @@
 <template>
-    <swiper class="swp">
-      <swiper-item v-for="item in topImages">
-        <img :src="item">
-      </swiper-item>
-    </swiper>
+  <swiper class="swp">
+    <swiper-item v-for="item in topImages" :key="item">
+      <img :src="item" >
+    </swiper-item>
+  </swiper>
 </template>
 
 <script>

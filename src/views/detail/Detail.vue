@@ -1,9 +1,15 @@
 <template>
   <div id="detail">
     <!-- 导航栏 -->
-    <detail-nav-bar></detail-nav-bar>
-    <detail-swiper :topImages="topImages"></detail-swiper>
-    <detail-base-info :goods="goods"></detail-base-info>
+    <detail-nav-bar class="detail-nav"></detail-nav-bar>
+    <scroll class="content" ref="scroll">
+      <detail-swiper :topImages="topImages"></detail-swiper>
+      <detail-base-info :goods="goods"></detail-base-info>
+      <detail-shop-info :shop="shop"></detail-shop-info>
+      <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad"></detail-goods-info>
+      <detail-param-info :paramInfo="paramInfo"></detail-param-info>
+    </scroll>
+
   </div>
 </template>
 
@@ -12,7 +18,11 @@
   import DetailNavBar from "./childComps/DetailNavBar";
   import DetailSwiper from "./childComps/DetailSwiper";
   import DetailBaseInfo from "./childComps/DetailBaseInfo";
-  import {getDetail,Goods,Shop} from "network/detail";
+  import DetailShopInfo from "./childComps/DetailShopInfo";
+  import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
+  import DetailParamInfo from "./childComps/DetailParamInfo";
+  import {getDetail,Goods,Shop,GoodParam} from "network/detail";
+  import Scroll from "components/common/scroll/Scroll";
 
   export default {
     name: "Detail",
@@ -21,13 +31,19 @@
         iid:null,
         topImages:[],
         goods:{},
-        shop:{}
+        shop:{},
+        detailInfo:{},
+        paramInfo:{}
       }
     },
     components:{
       DetailNavBar,
       DetailSwiper,
-      DetailBaseInfo
+      DetailBaseInfo,
+      DetailShopInfo,
+      DetailGoodsInfo,
+      DetailParamInfo,
+      Scroll
     },
     created() {
       // 1. 保存传入的iid
@@ -43,12 +59,47 @@
         this.goods = new Goods(data.itemInfo, data.columns, data.shopInfo.services)
         //3. 获取商家信息
         this.shop = new Shop(data.shopInfo)
+        //4.保存商品的详情数据
+        this.detailInfo = data.detailInfo;
+        //5.获取参数信息
+        this.paramInfo = new GoodParam(data.itemParams.info, data.itemParams.rule)
       })
-
+    },
+    methods:{
+      imageLoad(){
+        this.$refs.scroll.refresh()
+      }
     }
   }
 </script>
 
 <style scoped>
 
+  #detail {
+    height: 100vh;
+    background-color: #fff;
+    position: relative;
+    z-index: 9;
+  }
+
+  .detail-nav {
+    position: relative;
+    z-index: 2;
+    background-color: #fff;
+  }
+  .content {
+    /*
+    使用betterScroll必须要给scroll组件一个高度
+    1.这里可以使用计算方式，完成高度的确定 */
+    height: calc(100% - 44px);
+    /*
+    2.使用绝对定位
+    position: absolute;
+    top: 44px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden; */
+
+  }
 </style>

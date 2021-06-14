@@ -7,7 +7,7 @@
     <div class="info-price">
       <span class="n-price">{{goods.newPrice}}</span>
       <span class="o-price">{{goods.oldPrice}}</span>
-      <span class="discount">{{goods.discount}}</span>
+      <span class="discount" v-if="goods.discount.length !== 0">{{goods.discount}}</span>
     </div>
     <div class="info-other">
       <span>{{goods.columns[0]}}</span>
@@ -91,7 +91,7 @@
     top: 2px;
   }
   .info-service span {
-    font-size: 13px;
+    font-size: 12px;
     color: #333;
   }
 
