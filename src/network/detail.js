@@ -36,7 +36,6 @@ export class Shop {
   }
 }
 
-
 export class GoodParam {
   constructor(info,rule){
     this.image = info.images ? info.images[0] : '';
@@ -44,3 +43,7 @@ export class GoodParam {
     this.sizes = rule.tables;
   }
 }
+
+
+
+
