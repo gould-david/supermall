@@ -9,6 +9,11 @@ export function getDetail(iid){
   })
 }
 
+export function getRecomend(){
+  return request({
+    url:'/recommend'
+  })
+}
 
 //ES6语法
 export class Goods {

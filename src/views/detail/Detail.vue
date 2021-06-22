@@ -9,6 +9,7 @@
       <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad"></detail-goods-info>
       <detail-param-info :paramInfo="paramInfo"></detail-param-info>
       <detail-comment-info :comment-info="commentInfo"></detail-comment-info>
+      <goods-list :goods="recommends"></goods-list>
     </scroll>
 
   </div>
@@ -23,8 +24,11 @@
   import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
   import DetailParamInfo from "./childComps/DetailParamInfo";
   import DetailCommentInfo from "./childComps/DetailCommentInfo";
-  import {getDetail,Goods,Shop,GoodParam} from "network/detail";
+  import {getDetail,Goods,Shop,GoodParam,getRecomend} from "network/detail";
+  //import {debounce} from "common/util";
+  import {itemListenerMixin} from "common/mixin";
   import Scroll from "components/common/scroll/Scroll";
+  import GoodsList from "components/content/goods/GoodsList";
 
   export default {
     name: "Detail",
@@ -36,10 +40,13 @@
         shop:{},
         detailInfo:{},
         paramInfo:{},
-        commentInfo:{}
+        commentInfo:{},
+        recommends:[],
+        itemImgListener: {}
       }
     },
     components:{
+      GoodsList,
       DetailNavBar,
       DetailSwiper,
       DetailBaseInfo,
@@ -72,6 +79,24 @@
           this.commentInfo = data.rate.list[0]
         }
       })
+
+      // 3 请求推荐数据
+      getRecomend().then(res => {
+        this.recommends = res.data.list;
+      })
+    },
+    mixins: [
+      itemListenerMixin
+    ],
+    mounted() {
+      //通过混入增加了 全局事件总线的监听
+    },
+    deactivated() {
+      //因为没有设置keep-live，因此这个钩子函数不执行
+    },
+    destroyed() {
+      //离开页面时，停止监听全局事件(即$bus.itemImageLoad)
+      this.$bus.$off('itemImageLoad',this.itemImgListener)
     },
     methods:{
       imageLoad(){

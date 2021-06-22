@@ -5,7 +5,7 @@
     </nav-bar>
     <tab-controll ref="tabControll1" :titles="['流行','新款','精选']" @tabClick="tabClick" class="tabControll" v-show="isTabFixed"/> <!--//v-show="isTabFixed"-->
     <scroll class="content"
-            ref="home_scroll"
+            ref="scroll"
             :probeType="3"
             @contentScroll="contentScroll"
             :pull-up-load="true"
@@ -42,7 +42,8 @@
   import FeatureView from "./childComps/FeatureView";
 
   import {getHomeMultidata,getHomeGoods} from "network/home";
-  import {debounce} from "common/util";
+  //import {debounce} from "common/util";
+  import {itemListenerMixin} from "common/mixin";
 
 
   export default {
@@ -73,7 +74,8 @@
         isShowBackTop: true,
         tabOffsetTop : 0,
         isTabFixed: false,
-        userScrollHeight:0
+        userScrollHeight:0,
+        itemImgListener:null
       }
     },
     created() {
@@ -83,32 +85,24 @@
       this.getHomeGoods('pop');
       this.getHomeGoods('new');
       this.getHomeGoods('sell');
-
-
     },
+    mixins:[
+      itemListenerMixin
+    ],
     mounted(){
-
-      // 如果监听是放到created中，那么有时是在created中取不this.$refs.home的对象的。
-      //监听事件总线中的GoodListItem中图片加载完成后发射出来的事件
-      /*console.log(this.$refs.home_scroll.refresh); 有返回值
-      console.log(this.$refs.home_scroll.refresh()); 无返回值，直接调用方法内部了*/
-      //使用防抖函数调用scroll.refresh
-      const refresh = debounce(this.$refs.home_scroll.refresh,200)
-      this.$bus.$on('itemImageLoad',() => {
-        /*this.$refs.home_scroll && this.$refs.home_scroll.refresh()*/
-        console.log('图片加载完成');
-        refresh()
-      })
     },
     activated() {
       console.log(this.userScrollHeight);
-      this.$refs.home_scroll.scrollTo(0 , this.userScrollHeight , 0 )
-      this.$refs.home_scroll.refresh()
+      this.$refs.scroll.scrollTo(0 , this.userScrollHeight , 0 )
+      this.$refs.scroll.refresh()
     },
     deactivated() {
       //记录上次滑动到的位置
-      this.userScrollHeight = this.$refs.home_scroll.getScrollHeight();
-      console.log(this.userScrollHeight);
+      this.userScrollHeight = this.$refs.scroll.getScrollHeight();
+      //console.log(this.userScrollHeight);
+
+      //当离开页面后，取消全局事件的监听,必须传入执行的函数
+      this.$bus.$off('itemImageLoad',this.itemImgListener)
     },
     methods:{
       /*
@@ -142,12 +136,12 @@
       /*// 一键到顶，接收子组件发射$emit过来的方法
       backTopClick(){
         //取得子组件的对象
-        console.log(this.$refs.home_scroll.scroll);
-        this.$refs.home_scroll.scroll.scrollTo(0,0)
+        console.log(this.$refs.scroll.scroll);
+        this.$refs.scroll.scroll.scrollTo(0,0)
       }*/
       backClick(){
         // 调用Scroll组件中封装好的方法。
-        this.$refs.home_scroll.scrollTo(0 , 0 , 1000)
+        this.$refs.scroll.scrollTo(0 , 0 , 1000)
       },
       contentScroll(position){
         //判断BackTop是否显示
@@ -158,7 +152,7 @@
       loadMore(){
         console.log('上拉加载，重新调用getHomeGoods');
         this.getHomeGoods(this.currentType)
-        this.$refs.home_scroll.finishPullingUp();
+        this.$refs.scroll.finishPullingUp();
       },
 
 
