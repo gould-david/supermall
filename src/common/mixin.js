@@ -8,12 +8,23 @@ export const itemListenerMixin = {
   /!*console.log(this.$refs.home_scroll.refresh); 有返回值
   console.log(this.$refs.home_scroll.refresh()); 无返回值，直接调用方法内部了*!/
   //使用防抖函数调用scroll.refresh*/
+  data(){
+    return {
+      itemImgListener: null,
+      newRefresh: null
+    }
+  },
   mounted() {
-    const refresh = debounce(this.$refs.scroll.refresh,200)
+    //封装了一个滚动刷新函数（防抖），且存于data内，方便在其他方法内直接调用
+    this.newRefresh = debounce(this.$refs.scroll.refresh,200)
     this.itemImgListener = () => {
-      refresh()
+      this.newRefresh()
     };
     this.$bus.$on('itemImageLoad',this.itemImgListener)
     console.log('混入的内容');
   }
 }
+
+
+
+

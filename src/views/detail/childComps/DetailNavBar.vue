@@ -1,7 +1,7 @@
 <template>
   <div>
     <nav-bar>
-      <div slot="left" class="back" @click="backClick">
+      <div slot="left" class="back" @titleClick="titleClick">
         <img src="~assets/img/common/back.svg">
       </div>
       <div slot="center" class="title">
@@ -30,7 +30,8 @@
     },
     methods:{
       titleClick(index){
-        this.currentTitle = index
+        this.currentTitle = index,
+        this.$emit('titleClick',index)
       },
       backClick(){
         this.$router.back()

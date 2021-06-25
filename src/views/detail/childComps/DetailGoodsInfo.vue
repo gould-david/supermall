@@ -37,10 +37,14 @@
     },
     methods:{
       imgLoad(){
+        /*
+        方法1：
+        防止运行多次refresh函数，这里利用了计数器，只让最后一次图片load后，发射自定义函数。
         if(++this.counter === this.imageLength){
           console.log('imageLoad');
           this.$emit('imageLoad')
-        }
+        }*/
+        this.$emit('imageLoad')
       }
     }
   }

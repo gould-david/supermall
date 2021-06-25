@@ -23,7 +23,7 @@
       }
     },
     mounted() {
-      console.log(this.titles);
+      //console.log(this.titles);
     },
     methods:{
       itemClick(index){

@@ -1,15 +1,15 @@
 <template>
   <div id="detail">
     <!-- 导航栏 -->
-    <detail-nav-bar class="detail-nav"></detail-nav-bar>
+    <detail-nav-bar class="detail-nav" @titleClick="titleClick"/>
     <scroll class="content" ref="scroll">
-      <detail-swiper :topImages="topImages"></detail-swiper>
-      <detail-base-info :goods="goods"></detail-base-info>
-      <detail-shop-info :shop="shop"></detail-shop-info>
-      <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad"></detail-goods-info>
-      <detail-param-info :paramInfo="paramInfo"></detail-param-info>
-      <detail-comment-info :comment-info="commentInfo"></detail-comment-info>
-      <goods-list :goods="recommends"></goods-list>
+      <detail-swiper :topImages="topImages" />
+      <detail-base-info :goods="goods" />
+      <detail-shop-info :shop="shop" />
+      <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad" />
+      <detail-param-info :paramInfo="paramInfo" ref="param" />
+      <detail-comment-info :comment-info="commentInfo" ref="comment" />
+      <goods-list :goods="recommends" ref="recommend"></goods-list>
     </scroll>
 
   </div>
@@ -29,6 +29,7 @@
   import {itemListenerMixin} from "common/mixin";
   import Scroll from "components/common/scroll/Scroll";
   import GoodsList from "components/content/goods/GoodsList";
+  import {debounce} from "../../common/util";
 
   export default {
     name: "Detail",
@@ -42,7 +43,8 @@
         paramInfo:{},
         commentInfo:{},
         recommends:[],
-        itemImgListener: {}
+        themeTopYs:[],
+        getThemeTopY:null
       }
     },
     components:{
@@ -78,12 +80,48 @@
         if(data.rate.cRate !== 0){
           this.commentInfo = data.rate.list[0]
         }
-      })
 
+        /*
+         第一次获取，值不对
+         原因：this.$refs.params.$el 压根没有渲染
+        this.themeTopYs = []
+        this.themeTopYs.push(0)
+        this.themeTopYs.push(this.$refs.param.$el.offsetTop)
+        this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
+        this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
+        console.log(this.themeTopYs);*/
+
+        //记录各个组件的offsetTop数据
+        /*this.$nextTick(() => {
+          // 第二次获取，值不对
+          // 根据最新的数据，对应的dom是已经被渲染出来的，
+          // 但图片依然是没有加载完成的（目前获取到的offsetTop不包含其中的图片
+          // offset值不对的时候，都是因为图片的问题
+          this.themeTopYs = []
+          this.themeTopYs.push(0)
+          this.themeTopYs.push(this.$refs.param.$el.offsetTop)
+          this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
+          this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
+          console.log(this.themeTopYs);
+        })*/
+
+
+      })
       // 3 请求推荐数据
       getRecomend().then(res => {
         this.recommends = res.data.list;
       })
+
+      //给getThemeTopY赋值,对给this.themeTopYs 进行防抖操作
+      this.getThemeTopY = debounce(() => {
+        this.themeTopYs = []
+        this.themeTopYs.push(0)
+        this.themeTopYs.push(this.$refs.param.$el.offsetTop)
+        this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
+        this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
+        console.log(this.themeTopYs);
+      },500)
+
     },
     mixins: [
       itemListenerMixin
@@ -100,7 +138,17 @@
     },
     methods:{
       imageLoad(){
-        this.$refs.scroll.refresh()
+        /* 搭配第一种方法使用
+        this.$refs.scroll.refresh()*/
+        ///混入中封装了newRefresh()的防抖方法
+        this.newRefresh()
+
+        //给getThemeTopY赋值
+        this.getThemeTopY()
+      },
+      titleClick(index){
+
+        this.$refs.scroll.scrollTo(0,-this.themeTopYs[index] ,500)
       }
     }
   }

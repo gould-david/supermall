@@ -35,11 +35,11 @@
     },
     computed:{
       isActive(){
-        console.log(this.path)
+        //console.log(this.path)
         return this.$route.path.indexOf(this.path) !== -1
       },
       tabbarolorActive(){
-        console.log(this.tabbarolor)
+        //console.log(this.tabbarolor)
         return this.isActive ? {color:this.tabbarolor}: {}
       }
     },
@@ -53,7 +53,7 @@
     methods:{
       itemClick(){
         this.$router.replace(this.path)
-        console.log('父传子的Path值：'+this.path)
+        //console.log('父传子的Path值：'+this.path)
       }
     }
   }

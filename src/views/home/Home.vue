@@ -75,7 +75,6 @@
         tabOffsetTop : 0,
         isTabFixed: false,
         userScrollHeight:0,
-        itemImgListener:null
       }
     },
     created() {
