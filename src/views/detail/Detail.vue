@@ -1,8 +1,15 @@
 <template>
   <div id="detail">
     <!-- 导航栏 -->
-    <detail-nav-bar class="detail-nav" @titleClick="titleClick"/>
-    <scroll class="content" ref="scroll">
+    <detail-nav-bar class="detail-nav"
+                    @titleClick="titleClick" ref="nav" />
+    <!--通过父传子将Detail中滚动后，所处于的主题（商品、参数、评论、推荐）传递至本组件中(详见DetailNavBar组件中的注释说明)
+        :currentIndex="currentIndex"-->
+
+    <scroll class="content"
+            ref="scroll"
+            :probeType="3"
+            @contentScroll="contentScroll">
       <detail-swiper :topImages="topImages" />
       <detail-base-info :goods="goods" />
       <detail-shop-info :shop="shop" />
@@ -44,7 +51,8 @@
         commentInfo:{},
         recommends:[],
         themeTopYs:[],
-        getThemeTopY:null
+        getThemeTopY:null,
+        currentIndex:0
       }
     },
     components:{
@@ -149,6 +157,23 @@
       titleClick(index){
 
         this.$refs.scroll.scrollTo(0,-this.themeTopYs[index] ,500)
+      },
+      contentScroll(position){
+        //1. 获取y值
+        const positionY = -position.y
+        //2. positionY和主题中值进行对比
+        for(let i in this.themeTopYs){
+          /*console.log(i);
+          console.log(this.themeTopYs[parseInt(i)]);
+          console.log(positionY);*/
+          if(this.currentIndex !== i && ((parseInt(i) < this.themeTopYs.length - 1 && this.themeTopYs[parseInt(i)] < positionY && positionY < this.themeTopYs[parseInt(i)+1])
+            ||
+            (parseInt(i) === this.themeTopYs.length - 1 && positionY > this.themeTopYs[parseInt(i)]))){
+            this.currentIndex = parseInt(i);
+            this.$refs.nav.currentTitle = this.currentIndex
+          }
+        }
+        //console.log(position);
       }
     }
   }
