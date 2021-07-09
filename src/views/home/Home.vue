@@ -40,16 +40,17 @@
   import HomeSwiper from "./childComps/HomeSwiper";
   import RecommendView from "./childComps/RecommendView";
   import FeatureView from "./childComps/FeatureView";
+  import {BACK_POSITION} from "common/const";
 
   import {getHomeMultidata,getHomeGoods} from "network/home";
   //import {debounce} from "common/util";
-  import {itemListenerMixin} from "common/mixin";
+  import {itemListenerMixin,backTopMixin} from "common/mixin";
 
 
   export default {
     name: "Home",
     components: {
-      NavBar,TabControll,GoodsList,Scroll,BackTop,
+      NavBar,TabControll,GoodsList,Scroll,
       HomeSwiper,
       RecommendView,
       FeatureView,
@@ -71,7 +72,6 @@
           'sell':{page: 0, list:[]}
         },
         currentType:'pop',
-        isShowBackTop: true,
         tabOffsetTop : 0,
         isTabFixed: false,
         userScrollHeight:0,
@@ -86,7 +86,8 @@
       this.getHomeGoods('sell');
     },
     mixins:[
-      itemListenerMixin
+      itemListenerMixin,
+      backTopMixin
     ],
     mounted(){
     },
@@ -138,13 +139,10 @@
         console.log(this.$refs.scroll.scroll);
         this.$refs.scroll.scroll.scrollTo(0,0)
       }*/
-      backClick(){
-        // 调用Scroll组件中封装好的方法。
-        this.$refs.scroll.scrollTo(0 , 0 , 1000)
-      },
+
       contentScroll(position){
         //判断BackTop是否显示
-        this.isShowBackTop = Math.abs(position.y) > 1000
+        this.isShowBackTop = Math.abs(position.y) > BACK_POSITION
         //决定TabControll2是否吸顶(position:fixed)
         this.isTabFixed = Math.abs(position.y) > this.tabOffsetTop
       },

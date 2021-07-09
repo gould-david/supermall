@@ -19,6 +19,9 @@
       <goods-list :goods="recommends" ref="recommend"></goods-list>
     </scroll>
 
+    <detail-bottom-bar @addCart="addToCart"/>
+
+    <back-top @click.native="backClick" v-show="isShowBackTop"/>
   </div>
 </template>
 
@@ -32,8 +35,10 @@
   import DetailParamInfo from "./childComps/DetailParamInfo";
   import DetailCommentInfo from "./childComps/DetailCommentInfo";
   import {getDetail,Goods,Shop,GoodParam,getRecomend} from "network/detail";
+  import DetailBottomBar from "./childComps/DetailBottomBar";
   //import {debounce} from "common/util";
-  import {itemListenerMixin} from "common/mixin";
+  import {itemListenerMixin,backTopMixin} from "common/mixin";
+  import {BACK_POSITION} from "common/const";
   import Scroll from "components/common/scroll/Scroll";
   import GoodsList from "components/content/goods/GoodsList";
   import {debounce} from "../../common/util";
@@ -52,7 +57,7 @@
         recommends:[],
         themeTopYs:[],
         getThemeTopY:null,
-        currentIndex:0
+        currentIndex:0,
       }
     },
     components:{
@@ -64,8 +69,12 @@
       DetailGoodsInfo,
       DetailParamInfo,
       DetailCommentInfo,
+      DetailBottomBar,
       Scroll
     },
+    mixins: [
+      itemListenerMixin,backTopMixin
+    ],
     created() {
       // 1. 保存传入的iid
       this.iid = this.$route.params.iid
@@ -131,9 +140,6 @@
       },500)
 
     },
-    mixins: [
-      itemListenerMixin
-    ],
     mounted() {
       //通过混入增加了 全局事件总线的监听
     },
@@ -155,7 +161,6 @@
         this.getThemeTopY()
       },
       titleClick(index){
-
         this.$refs.scroll.scrollTo(0,-this.themeTopYs[index] ,500)
       },
       contentScroll(position){
@@ -166,14 +171,18 @@
           /*console.log(i);
           console.log(this.themeTopYs[parseInt(i)]);
           console.log(positionY);*/
-          if(this.currentIndex !== i && ((parseInt(i) < this.themeTopYs.length - 1 && this.themeTopYs[parseInt(i)] < positionY && positionY < this.themeTopYs[parseInt(i)+1])
+          if(this.currentIndex !== i && ((parseInt(i) < this.themeTopYs.length - 1 && this.themeTopYs[parseInt(i)] < positionY && positionY <= this.themeTopYs[parseInt(i)+1])
             ||
-            (parseInt(i) === this.themeTopYs.length - 1 && positionY > this.themeTopYs[parseInt(i)]))){
+            (parseInt(i) === this.themeTopYs.length - 1 && positionY >= this.themeTopYs[parseInt(i)]))){
             this.currentIndex = parseInt(i);
             this.$refs.nav.currentTitle = this.currentIndex
           }
         }
-        //console.log(position);
+        //3 .滚动到一定位置，显示返回顶部按钮
+        this.isShowBackTop = Math.abs(position.y) > BACK_POSITION
+      },
+      addToCart(){
+        console.log('加入购物车'+ this.iid);
       }
     }
   }
@@ -197,7 +206,7 @@
     /*
     使用betterScroll必须要给scroll组件一个高度
     1.这里可以使用计算方式，完成高度的确定 */
-    height: calc(100% - 44px);
+    height: calc(100% - 44px - 49px);
     /*
     2.使用绝对定位
     position: absolute;

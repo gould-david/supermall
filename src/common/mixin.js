@@ -1,6 +1,6 @@
 //混入
 import {debounce} from "./util";
-
+import BackTop from "components/content/backTop/BackTop";
 export const itemListenerMixin = {
 
 /*  // 如果监听是放到created中，那么有时是在created中取不this.$refs.home的对象的。
@@ -22,6 +22,23 @@ export const itemListenerMixin = {
     };
     this.$bus.$on('itemImageLoad',this.itemImgListener)
     console.log('混入的内容');
+  }
+}
+
+export const backTopMixin = {
+  components:{
+    BackTop
+  },
+  data(){
+    return {
+      isShowBackTop: false
+    }
+  },
+  methods:{
+    backClick(){
+      // 调用Scroll组件中封装好的方法。
+      this.$refs.scroll.scrollTo(0 , 0 , 1000)
+    }
   }
 }
 
