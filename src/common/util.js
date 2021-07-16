@@ -9,7 +9,7 @@ export function debounce(func, delay){
     if(timer) clearTimeout(timer)
     //console.log('延时器未执行');
     timer = setTimeout(() => {
-      console.log('延时器被执行');
+      //console.log('延时器被执行');
       func.apply(this, args)
     },delay)
   }

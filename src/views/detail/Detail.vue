@@ -171,7 +171,9 @@
           /*console.log(i);
           console.log(this.themeTopYs[parseInt(i)]);
           console.log(positionY);*/
-          if(this.currentIndex !== i && ((parseInt(i) < this.themeTopYs.length - 1 && this.themeTopYs[parseInt(i)] < positionY && positionY <= this.themeTopYs[parseInt(i)+1])
+          if(this.currentIndex !== i
+            &&
+            ((parseInt(i) < this.themeTopYs.length - 1 && this.themeTopYs[parseInt(i)] <= positionY && positionY < this.themeTopYs[parseInt(i)+1])
             ||
             (parseInt(i) === this.themeTopYs.length - 1 && positionY >= this.themeTopYs[parseInt(i)]))){
             this.currentIndex = parseInt(i);
@@ -182,7 +184,19 @@
         this.isShowBackTop = Math.abs(position.y) > BACK_POSITION
       },
       addToCart(){
-        console.log('加入购物车'+ this.iid);
+        //console.log('加入购物车'+ this.iid);
+        //1. 获取购物车需要展示的信息
+        const product = {};
+        product.iid = this.iid
+        product.image = this.topImages[0];
+        product.title = this.goods.title;
+        product.desc = this.goods.desc;
+        product.price = this.goods.lowNowPrice;
+        product.count = 0
+        console.log(product);
+        // 2. 将商品添加到购物车中,添加到Vuex中
+        this.$store.commit('addCart',product)
+
       }
     }
   }

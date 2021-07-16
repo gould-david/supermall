@@ -22,7 +22,7 @@
     },
     computed: {
       showImage(){
-        console.log('showimg');
+        //console.log('showimg');
         return this.goodsItem.image || this.goodsItem.show.img;
       }
     },
