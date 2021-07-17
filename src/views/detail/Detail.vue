@@ -9,6 +9,7 @@
     <scroll class="content"
             ref="scroll"
             :probeType="3"
+            :pull-up-load="false"
             @contentScroll="contentScroll">
       <detail-swiper :topImages="topImages" />
       <detail-base-info :goods="goods" />
@@ -192,11 +193,9 @@
         product.title = this.goods.title;
         product.desc = this.goods.desc;
         product.price = this.goods.lowNowPrice;
-        product.count = 0
         console.log(product);
         // 2. 将商品添加到购物车中,添加到Vuex中
-        this.$store.commit('addCart',product)
-
+        this.$store.dispatch('addCart', product)
       }
     }
   }
