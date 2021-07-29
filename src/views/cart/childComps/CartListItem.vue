@@ -2,6 +2,8 @@
   <div id="shop-item">
     <div class="item-selector">
       <!-- 勾选组件 -->
+      <!-- 监听按钮组件的点击事件，可以在父组件中增加@click.native 进行实现，这样就省去了在子组件内部再通过$emit发射事件来监听了 -->
+      <check-button :isChecked="product.checked" @click.native="checkClick"/>
     </div>
     <div class="item-img">
       <img :src="product.image" alt="商品图片" />
@@ -18,6 +20,9 @@
 </template>
 
 <script>
+  import CheckButton from "components/content/checkButton/CheckButton";
+  import {UPDATECHECK} from "store/mutations-types";
+
   export default {
     name: "CartListItem",
     props:{
@@ -26,6 +31,15 @@
         default(){
           return {}
         }
+      }
+    },
+    components:{
+      CheckButton
+    },
+    methods:{
+      checkClick(){
+        //this.product.checked = !this.product.checked
+        this.$store.commit(UPDATECHECK,this.product)
       }
     }
   }
@@ -43,7 +57,7 @@
     display: flex;
     width: 20px;
     justify-content: center;
-    align-content: center;
+    align-items: center;
   }
   .item-title , .item-desc {
     overflow: hidden;

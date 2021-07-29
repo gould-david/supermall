@@ -5,16 +5,21 @@
     </nav-bar>
     <!-- 商品列表 -->
     <cart-list class="cart-list"/>
+
+    <!-- 底部汇总-->
+    <cart-bottom-bar />
   </div>
 </template>
 
 <script>
   import NavBar from "components/common/navbar/NavBar";
   import CartList from "./childComps/CartList";
+  import CartBottomBar from "./childComps/CartBottomBar";
   import {mapGetters} from 'vuex';
   export default {
     name: "Cart",
     components:{
+      CartBottomBar,
       NavBar,
       CartList
     },
@@ -40,6 +45,6 @@
     font-weight: 700;
   }
   .cart-list {
-    height: calc(100% - 44px);
+    height: calc(100% - 44px - 40px);
   }
 </style>
