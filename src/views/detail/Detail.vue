@@ -23,6 +23,8 @@
     <detail-bottom-bar @addCart="addToCart"/>
 
     <back-top @click.native="backClick" v-show="isShowBackTop"/>
+    <!--<toast message="哈哈哈哈哈哈哈哈哈"/>-->
+
   </div>
 </template>
 
@@ -42,7 +44,9 @@
   import {BACK_POSITION} from "common/const";
   import Scroll from "components/common/scroll/Scroll";
   import GoodsList from "components/content/goods/GoodsList";
+  import Toast from "components/common/toast/Toast";
   import {debounce} from "../../common/util";
+  import {mapActions} from 'vuex'
 
   export default {
     name: "Detail",
@@ -71,7 +75,8 @@
       DetailParamInfo,
       DetailCommentInfo,
       DetailBottomBar,
-      Scroll
+      Scroll,
+      Toast
     },
     mixins: [
       itemListenerMixin,backTopMixin
@@ -152,6 +157,7 @@
       this.$bus.$off('itemImageLoad',this.itemImgListener)
     },
     methods:{
+      ...mapActions(['addCart']),
       imageLoad(){
         /* 搭配第一种方法使用
         this.$refs.scroll.refresh()*/
@@ -195,7 +201,16 @@
         product.price = this.goods.lowNowPrice;
         console.log(product);
         // 2. 将商品添加到购物车中,添加到Vuex中
-        this.$store.dispatch('addCart', product)
+        /*
+           补充，可以利用与mapperGetter（导入至计算属性中）类似，通过mapperActions，将Vuex Actions中的方法，引入组件内，引入后可以直接通过this进行调用
+
+        this.$store.dispatch('addCart', product).then(res => {
+          console.log(res);
+        })
+           */
+        this.addCart(product).then(res => {
+          this.$toast.show(res)
+        })
       }
     }
   }
